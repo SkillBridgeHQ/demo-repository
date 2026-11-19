@@ -1,0 +1,57 @@
+# Environment secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Build and package output
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+
+# Tests and tooling caches
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# Local logs and database files
+*.log
+*.sqlite3
+*.db
+
+# Private key files
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local recovery and migration preview files
+*.bak
+alembic_offline_preview.sql
+
+# Local recovery backups
+*.backup.*

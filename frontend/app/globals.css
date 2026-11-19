@@ -1,0 +1,513 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --foreground: #ffffff;
+  --cyan: #00f0ff;
+  --purple: #b026ff;
+  --green: #00ff66;
+}
+
+* {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #00f0ff;
+  color: #000;
+}
+
+/* CUSTOM SCROLLBAR */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--cyan), var(--purple));
+  border-radius: 20px;
+}
+
+/* ANIMATED BACKGROUND GRID */
+
+/* ANIMATED CYBER GRID */
+
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(
+      rgba(0, 240, 255, 0.12) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 240, 255, 0.12) 1px,
+      transparent 1px
+    );
+
+  background-size: 45px 45px;
+
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    rgba(0, 0, 0, 0.8) 65%,
+    transparent 100%
+  );
+
+  animation: gridMove 15s linear infinite;
+}
+
+@keyframes gridMove {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 45px 45px;
+  }
+}
+
+
+/* GRADIENT TEXT */
+
+.gradient-text {
+  background: linear-gradient(
+    100deg,
+    #00f0ff 0%,
+    #b026ff 45%,
+    #00f0ff 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 5s linear infinite;
+}
+
+
+/* GLASSMORPHISM */
+
+.glass-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  background: rgba(10, 18, 25, 0.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 0 25px rgba(0, 240, 255, 0.04),
+    inset 0 0 20px rgba(0, 240, 255, 0.025);
+}
+
+/* FLOATING TERMINALS */
+
+.float-card {
+  animation: floating 5s ease-in-out infinite;
+}
+
+.float-card:nth-child(2) {
+  animation-delay: -2.5s;
+}
+
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-13px);
+  }
+}
+
+/* EMAIL INPUT */
+
+.access-box {
+  position: relative;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  background: rgba(0, 240, 255, 0.035);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.06);
+  transition: all 0.3s ease;
+}
+
+.access-box:focus-within {
+  border-color: var(--cyan);
+  box-shadow:
+    0 0 10px rgba(0, 240, 255, 0.2),
+    0 0 35px rgba(0, 240, 255, 0.1);
+}
+
+/* SUCCESS PANEL */
+
+.success-panel {
+  animation: successAppear 0.6s ease both;
+  box-shadow: 0 0 35px rgba(0, 255, 102, 0.08);
+}
+
+@keyframes successAppear {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* FEATURE CARDS */
+
+.feature-card {
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(15px);
+  transition:
+    transform 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(
+    circle at top left,
+    color-mix(in srgb, var(--accent) 15%, transparent),
+    transparent 65%
+  );
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.feature-card:hover {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--accent) 15%, transparent),
+    0 0 55px color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.feature-card:hover::before {
+  opacity: 1;
+}
+
+.feature-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* PASSPORT CARD */
+
+.passport-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.06);
+  transition: box-shadow 0.4s ease;
+}
+
+.passport-card:hover {
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.16);
+}
+
+/* DASHBOARD WINDOW */
+
+.dashboard-window {
+  box-shadow:
+    0 0 50px rgba(0, 240, 255, 0.045),
+    0 30px 100px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+}
+
+/* XP BARS */
+
+.xp-bar {
+  animation: barGrow 1.5s ease both;
+  transform-origin: left;
+}
+
+@keyframes barGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* BUTTON ANIMATIONS */
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a {
+  transition: all 0.3s ease;
+}
+
+/* NAVIGATION */
+
+header {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 640px) {
+  .grid-bg {
+    background-size: 35px 35px;
+  }
+
+  .orb {
+    width: 250px;
+    height: 250px;
+    filter: blur(85px);
+  }
+
+  .float-card {
+    animation-duration: 6s;
+  }
+}
+
+/* REDUCED MOTION ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+
+/* =========================================
+   SKILLBRIDGE - CINEMATIC HERO EXPERIENCE
+========================================= */
+
+/* Hero headline glow */
+
+#protocol h1 {
+  position: relative;
+  animation: heroGlow 3s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.15));
+}
+
+
+
+/* Main headline glow animation */
+
+@keyframes heroGlow {
+  from {
+    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.15));
+  }
+
+  to {
+    filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.4))
+            drop-shadow(0 0 35px rgba(176, 38, 255, 0.2));
+  }
+}
+
+/* Gradient movement */
+
+@keyframes gradientFlow {
+  from {
+    background-position: 0% center;
+  }
+
+  to {
+    background-position: 250% center;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  #protocol h1,
+  #protocol h1 .gradient-text {
+    animation: none;
+  }
+}
+
+
+/* =========================================
+   SKILLBRIDGE - ANIMATED NEON ORBS
+========================================= */
+
+.orb {
+  position: fixed;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  filter: blur(110px);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+  contain: layout paint;
+}
+
+.orb-blue {
+  top: 8%;
+  left: -180px;
+  background: #00f0ff;
+  animation: blueOrbMove 14s ease-in-out infinite alternate;
+}
+
+.orb-purple {
+  top: 35%;
+  right: -180px;
+  background: #b026ff;
+  animation: purpleOrbMove 17s ease-in-out infinite alternate;
+}
+
+@keyframes blueOrbMove {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(180px, 120px) scale(1.2);
+  }
+
+  100% {
+    transform: translate(80px, 300px) scale(0.9);
+  }
+}
+
+@keyframes purpleOrbMove {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-160px, 150px) scale(1.15);
+  }
+
+  100% {
+    transform: translate(-80px, -100px) scale(0.9);
+  }
+}
+
+/* Mobile optimization */
+
+@media (max-width: 768px) {
+  .orb {
+    width: 280px;
+    height: 280px;
+    filter: blur(85px);
+    opacity: 0.13;
+  }
+}
+
+/* Reduced motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    animation: none;
+  }
+}
+
+
+
+/* =========================================
+   TERMINAL WIDGET ANIMATIONS
+========================================= */
+
+.float-card {
+  animation: floating 5s ease-in-out infinite;
+  transition:
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.float-card:nth-child(2) {
+  animation-delay: -2.5s;
+}
+
+@keyframes floating {
+  0%, 100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -13px;
+  }
+}
+
+.float-card:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.12);
+}
+
+.float-card .rounded-full.bg-white\/10 {
+  overflow: hidden;
+}
+
+.float-card .rounded-full.bg-white\/10 > div {
+  animation: terminalProgress 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes terminalProgress {
+  from {
+    width: 55%;
+    opacity: 0.65;
+  }
+
+  to {
+    width: 95%;
+    opacity: 1;
+  }
+}
+
+
+/* =====================================
+   SCROLL REVEAL EFFECTS
+===================================== */
+
+.reveal-element {
+  opacity: 0;
+  transform: translateY(35px);
+  filter: blur(5px);
+
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease,
+    filter 0.8s ease;
+}
+
+.reveal-element.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-element {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
