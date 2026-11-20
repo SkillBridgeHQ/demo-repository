@@ -501,13 +501,7 @@ class Settings(BaseSettings):
                     f"EMAIL_FROM contains an invalid email address: {exc}"
                 ) from exc
 
-            if (
-                self.EMAIL_MODE == "smtp"
-                and normalized_email != normalized_smtp_username
-            ):
-                raise ValueError(
-                    "For SMTP, the EMAIL_FROM address must match SMTP_USERNAME."
-                )
+            pass
 
         elif self.EMAIL_FROM:
             if "\n" in self.EMAIL_FROM or "\r" in self.EMAIL_FROM:
