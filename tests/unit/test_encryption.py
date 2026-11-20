@@ -243,6 +243,26 @@ def test_incorrect_encryption_key_rejection(raw_token, monkeypatch):
         decrypt_token(envelope, purpose="verify")
 
 
+def test_v2_encrypt_decrypt_verification(raw_token, monkeypatch):
+    v2_key = base64.b64encode(os.urandom(32)).decode("ascii")
+    monkeypatch.setenv("ENCRYPTION_KEY_V2", v2_key)
+    monkeypatch.setenv("ENCRYPTION_ACTIVE_KEY_VERSION", "v2")
+    get_settings.cache_clear()
+
+    envelope = encrypt_token(raw_token, purpose="verify")
+    assert envelope.startswith("v2.")
+    assert decrypt_token(envelope, purpose="verify") == raw_token
+
+def test_v1_envelope_remains_decryptable_when_v2_is_active(raw_token, monkeypatch):
+    v1_envelope = encrypt_token(raw_token, purpose="verify")
+
+    v2_key = base64.b64encode(os.urandom(32)).decode("ascii")
+    monkeypatch.setenv("ENCRYPTION_KEY_V2", v2_key)
+    monkeypatch.setenv("ENCRYPTION_ACTIVE_KEY_VERSION", "v2")
+    get_settings.cache_clear()
+
+    assert decrypt_token(v1_envelope, purpose="verify") == raw_token
+
 def test_fresh_nonce_generation(raw_token):
     envelope1 = encrypt_token(raw_token, purpose="verify")
     envelope2 = encrypt_token(raw_token, purpose="verify")

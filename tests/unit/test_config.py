@@ -97,10 +97,22 @@ def test_encryption_key_invalid(isolated_env, bad_key, expected_error):
         Settings()
 
 
-def test_encryption_version_lock(isolated_env):
-    """Ensures the application strictly requires v1 until dynamic rotation is implemented."""
+def test_encryption_v2_version_accepts_valid_v2_key(isolated_env):
+    """V2 can be activated when a valid V2 key is configured."""
+    valid_key = base64.b64encode(os.urandom(32)).decode("ascii")
+    isolated_env.setenv("ENCRYPTION_KEY_V2", valid_key)
     isolated_env.setenv("ENCRYPTION_ACTIVE_KEY_VERSION", "v2")
-    with pytest.raises(ValidationError, match="must equal 'v1'"):
+
+    settings = Settings()
+    assert settings.ENCRYPTION_ACTIVE_KEY_VERSION == "v2"
+    assert isinstance(settings.ENCRYPTION_KEY_V2, SecretStr)
+
+def test_encryption_v2_requires_v2_key(isolated_env):
+    """V2 activation must fail when its key is absent."""
+    isolated_env.setenv("ENCRYPTION_ACTIVE_KEY_VERSION", "v2")
+    isolated_env.delenv("ENCRYPTION_KEY_V2", raising=False)
+
+    with pytest.raises(ValidationError, match="ENCRYPTION_KEY_V2"):
         Settings()
 
 

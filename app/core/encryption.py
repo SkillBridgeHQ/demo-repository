@@ -19,16 +19,26 @@ ENVELOPE_DELIMITER = "."
 APP_IDENTITY = "skillbridge-waitlist"
 
 
-def _get_aesgcm_context() -> tuple[AESGCM, str]:
-    """
-    Retrieves the encryption key and active version from the application settings.
-    Initializes and returns the AESGCM cipher context alongside the expected version string.
-    """
+def _get_aesgcm_context(version: str | None = None) -> tuple[AESGCM, str]:
+    """Return the AES-GCM context for the active or requested envelope version."""
     settings = get_settings()
+    selected_version = version or settings.ENCRYPTION_ACTIVE_KEY_VERSION
+
+    if selected_version not in ("v1", "v2"):
+        raise EncryptionError("Unsupported encryption envelope version.")
+
+    secret = getattr(settings, f"ENCRYPTION_KEY_{selected_version.upper()}", None)
+    if secret is None:
+        raise EncryptionError("Encryption key for envelope version is unavailable.")
+
     try:
-        # Config validation ensures this is already valid Base64 and exactly 32 bytes
-        key_bytes = base64.b64decode(settings.ENCRYPTION_KEY_V1.get_secret_value(), validate=True)
-        return AESGCM(key_bytes), settings.ENCRYPTION_ACTIVE_KEY_VERSION
+        key_bytes = base64.b64decode(
+            secret.get_secret_value(),
+            validate=True,
+        )
+        if len(key_bytes) != 32:
+            raise ValueError("Invalid AES-256 key length.")
+        return AESGCM(key_bytes), selected_version
     except Exception:
         raise EncryptionError("Cryptographic engine failed to initialize.") from None
 
@@ -109,10 +119,8 @@ def decrypt_token(envelope: str, purpose: TokenPurpose) -> str:
         raise EncryptionError("Malformed encryption envelope.")
 
     version, nonce_b64, ctx_b64 = parts
-    aesgcm, active_version = _get_aesgcm_context()
-
-    if version != active_version:
-        raise EncryptionError("Unsupported encryption envelope version.")
+    # Decryption uses the key identified by the stored envelope version.
+    aesgcm, _ = _get_aesgcm_context(version)
 
     nonce = _strict_urlsafe_b64decode(nonce_b64)
     ciphertext = _strict_urlsafe_b64decode(ctx_b64)

@@ -29,8 +29,9 @@ class Settings(BaseSettings):
     )
 
     # 4. Security
-    ENCRYPTION_KEY_V1: SecretStr
-    ENCRYPTION_ACTIVE_KEY_VERSION: str = "v1"
+    ENCRYPTION_KEY_V1: Optional[SecretStr] = None
+    ENCRYPTION_KEY_V2: Optional[SecretStr] = None
+    ENCRYPTION_ACTIVE_KEY_VERSION: Literal["v1", "v2"] = "v1"
     TRUSTED_PROXY_CIDRS: List[str] = Field(
         default_factory=lambda: ["127.0.0.1/32"]
     )
@@ -191,20 +192,38 @@ class Settings(BaseSettings):
         if not parsed_db_url.database:
             raise ValueError("DATABASE_URL must contain a valid database name.")
 
-        # 2. Encryption Key Validation
-        if self.ENCRYPTION_ACTIVE_KEY_VERSION != "v1":
-            raise ValueError("ENCRYPTION_ACTIVE_KEY_VERSION must equal 'v1' in all environments.")
+        # 2. Versioned AES-256-GCM encryption key validation.
+        encryption_keys = {
+            "v1": self.ENCRYPTION_KEY_V1,
+            "v2": self.ENCRYPTION_KEY_V2,
+        }
 
-        try:
-            key_bytes = base64.b64decode(
-                self.ENCRYPTION_KEY_V1.get_secret_value(),
-                validate=True
+        active_key = encryption_keys[self.ENCRYPTION_ACTIVE_KEY_VERSION]
+        if active_key is None or not active_key.get_secret_value().strip():
+            raise ValueError(
+                f"ENCRYPTION_KEY_{self.ENCRYPTION_ACTIVE_KEY_VERSION.upper()} "
+                "must be configured for the active encryption version."
             )
-        except (binascii.Error, ValueError, UnicodeError):
-            raise ValueError("ENCRYPTION_KEY_V1 must be a valid Base64 encoded string.")
 
-        if len(key_bytes) != 32:
-            raise ValueError("ENCRYPTION_KEY_V1 must decode to exactly 32 bytes for AES-256-GCM.")
+        for version, secret in encryption_keys.items():
+            if secret is None:
+                continue
+
+            key_name = f"ENCRYPTION_KEY_{version.upper()}"
+            try:
+                key_bytes = base64.b64decode(
+                    secret.get_secret_value(),
+                    validate=True,
+                )
+            except (binascii.Error, ValueError, UnicodeError):
+                raise ValueError(
+                    f"{key_name} must be a valid Base64 encoded string."
+                ) from None
+
+            if len(key_bytes) != 32:
+                raise ValueError(
+                    f"{key_name} must decode to exactly 32 bytes for AES-256-GCM."
+                )
 
         # 3. Trusted Proxy Validation
         for cidr in self.TRUSTED_PROXY_CIDRS:
