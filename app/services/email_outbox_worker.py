@@ -307,14 +307,14 @@ def _send_smtp(
         raise _PermanentProcessingError("invalid_email_from")
 
     _, sender_address = parseaddr(sender)
-    if not sender_address or sender_address.casefold() != username.casefold():
-        raise _PermanentProcessingError("smtp_sender_mismatch")
+    if not sender_address:
+        raise _PermanentProcessingError("invalid_email_from")
 
     host = getattr(settings, "SMTP_HOST", None)
     port = getattr(settings, "SMTP_PORT", None)
     if not isinstance(host, str) or not host.strip():
         raise _PermanentProcessingError("invalid_smtp_host")
-    if isinstance(port, bool) or not isinstance(port, int) or port != 587:
+    if isinstance(port, bool) or not isinstance(port, int) or port not in (587, 2525):
         raise _PermanentProcessingError("smtp_starttls_requires_port_587")
 
     message = EmailMessage()
