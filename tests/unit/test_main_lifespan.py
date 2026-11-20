@@ -17,6 +17,10 @@ def mock_settings():
     settings.REDIS_URL = None
     settings.ENCRYPTION_KEY_V1 = MagicMock()
     settings.ENCRYPTION_KEY_V1.get_secret_value.return_value = "mocked-secret-key"
+
+    settings.ENCRYPTION_ACTIVE_KEY_VERSION = "v2"
+    settings.ENCRYPTION_KEY_V2 = MagicMock()
+    settings.ENCRYPTION_KEY_V2.get_secret_value.return_value = "mocked-v2-secret-key"
     settings.CORS_ORIGINS = ["http://localhost:5173"]
     return settings
 
@@ -56,7 +60,7 @@ async def test_redis_startup_success_and_shutdown(mock_get_settings, mock_from_u
         # Startup
         mock_from_url.assert_called_once_with("rediss://fake-redis", socket_timeout=3.0, socket_connect_timeout=3.0, decode_responses=True)
         mock_redis_client.ping.assert_awaited_once()
-        mock_derive.assert_called_once_with("mocked-secret-key")
+        mock_derive.assert_called_once_with("mocked-v2-secret-key")
 
         mock_limiter_class.assert_called_once_with(
             redis_client=mock_redis_client,

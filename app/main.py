@@ -35,8 +35,17 @@ async def lifespan(app: FastAPI):
             )
             await redis_client.ping()
 
+            active_key_version = settings.ENCRYPTION_ACTIVE_KEY_VERSION
+            active_key_name = f"ENCRYPTION_KEY_{active_key_version.upper()}"
+            active_encryption_key = getattr(settings, active_key_name, None)
+
+            if active_encryption_key is None:
+                raise RuntimeError(
+                    "Active encryption key is not configured for rate limiting."
+                )
+
             identity_key_bytes = derive_rate_limit_identity_key(
-                settings.ENCRYPTION_KEY_V1.get_secret_value()
+                active_encryption_key.get_secret_value()
             )
 
             app.state.rate_limiter = RedisRateLimiter(
@@ -53,8 +62,12 @@ async def lifespan(app: FastAPI):
                 except Exception:
                     pass
             raise
-        except Exception:
-            # Initialization failure (e.g., timeout, DNS failure, constructor exception)
+        except Exception as exc:
+            # Log only the exception type; never expose Redis credentials.
+            logger.error(
+                "Redis rate limiter initialization failed error_type=%s",
+                type(exc).__name__,
+            )
             if redis_client:
                 try:
                     await redis_client.aclose()
