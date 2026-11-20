@@ -459,10 +459,8 @@ class Settings(BaseSettings):
             ):
                 raise ValueError("SMTP_HOST must be a valid non-empty hostname.")
 
-            if self.SMTP_PORT != 587:
-                raise ValueError(
-                    "SMTP_PORT must be 587 when using STARTTLS."
-                )
+            if self.SMTP_PORT not in (587, 2525):
+                raise ValueError("SMTP_PORT must be 587 or 2525 when using STARTTLS.")
 
             if "\n" in self.SMTP_USERNAME or "\r" in self.SMTP_USERNAME:
                 raise ValueError("SMTP_USERNAME must not contain newline characters.")
